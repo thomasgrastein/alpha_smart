@@ -13,5 +13,7 @@
     "boto3==1.34.25"
   ],
   "ssdp": [],
-  "zeroconf": []
+  "zeroconf": [],
+  "issue_tracker": "",
+  "version": "0.0.1"
 }

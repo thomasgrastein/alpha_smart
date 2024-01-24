@@ -16,15 +16,11 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import httpx_client
 
-from .const import DOMAIN, IDENTITY_ID
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 STEP_USER_DATA_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_USERNAME): str,
-        vol.Required(CONF_PASSWORD): str,
-        vol.Required(IDENTITY_ID): str,
-    }
+    {vol.Required(CONF_USERNAME): str, vol.Required(CONF_PASSWORD): str}
 )
 
 
@@ -49,6 +45,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     user_pool_id = cloud_info_json["cognito"]["alphaSmart"]["userPoolId"]
     user_pool_region = cloud_info_json["region"]
     client_id = cloud_info_json["cognito"]["alphaSmart"]["webClientId"]
+    identity_pool_id = cloud_info_json["cognito"]["alphaSmart"]["identityPoolId"]
 
     def get_idp_client():
         return client("cognito-idp", region_name=user_pool_region)
@@ -70,9 +67,22 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
 
     identity_client = await hass.async_add_executor_job(get_identity_client)
 
+    def get_identity_id():
+        return identity_client.get_id(
+            IdentityPoolId=identity_pool_id,
+            Logins={
+                f"cognito-idp.{user_pool_region}.amazonaws.com/{user_pool_id}": tokens[
+                    "AuthenticationResult"
+                ]["IdToken"]
+            },
+        )
+
+    identity_id = await hass.async_add_executor_job(get_identity_id)
+    _LOGGER.info(identity_id)
+
     def temp_credentials():
         return identity_client.get_credentials_for_identity(
-            IdentityId=data[IDENTITY_ID],  # Still need to figure out where this is from
+            IdentityId=identity_id["IdentityId"],
             Logins={
                 f"cognito-idp.{user_pool_region}.amazonaws.com/{user_pool_id}": tokens[
                     "AuthenticationResult"
@@ -108,7 +118,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
             "user_pool_region": user_pool_region,
             "client_id": client_id,
         },
-        "identity_id": data[IDENTITY_ID],
+        "identity_id": identity_id["IdentityId"],
     }
 
 

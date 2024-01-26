@@ -3,7 +3,7 @@ import logging
 from homeassistant.components.climate import ClimateEntity, ClimateEntityFeature
 from homeassistant.components.climate.const import HVACMode
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfTemperature
+from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -83,3 +83,10 @@ class AlphaSmartClimate(CoordinatorEntity[AlphaSmartCoordinator], ClimateEntity)
     def current_humidity(self) -> float:
         """Return the current humidity."""
         return self.coordinator.data[self.unique_id]["33"]
+
+    async def async_set_temperature(self, **kwargs) -> None:
+        """Set new target temperature."""
+        temperature = kwargs.get(ATTR_TEMPERATURE)
+        if temperature is None:
+            return
+        await self.coordinator.async_set_target_temperature(self.unique_id, temperature)

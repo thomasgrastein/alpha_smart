@@ -1,0 +1,12 @@
+__pycache___
+.HA_VERSION
+automations.yaml
+configuration.yaml
+home-assistant_v2.*
+home-assistant.log*
+scenes.yaml
+scripts.yaml
+secrets.yaml
+.storage/*
+blueprints/*
+custom_components/thomasgrastein/__pycache__/*

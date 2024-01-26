@@ -84,6 +84,11 @@ class AlphaSmartCoordinator(DataUpdateCoordinator):
                 url = api_endpoint + "/v1/devices/" + device["deviceId"] + "/values"
                 device_values = await httpx_session.get(url)
                 device_values_json = device_values.json()
+                _LOGGER.info(
+                    "last heartbeat for device %s: %s",
+                    device_values_json["name"],
+                    device_values_json["lastHeartbeatAt"],
+                )
                 obj[device["deviceId"]] = device_values_json
             return obj
         except ConnectionError as err:

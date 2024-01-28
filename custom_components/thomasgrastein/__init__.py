@@ -77,6 +77,12 @@ class AlphaSmartCoordinator(DataUpdateCoordinator):
             httpx_session = httpx_client.get_async_client(self.hass)
             auth = await self.async_get_auth()
             httpx_session.auth = auth
+            requests_mqtt_update = await httpx_session.get(
+                "https://"
+                + self.hass.data[DOMAIN]["data"]["cloud_info"]["mqtt_broker_endpoint"]
+                + "/mqtt"
+            )
+            _LOGGER.debug(requests_mqtt_update.headers)
             obj = {}
             cloud_info = self.hass.data[DOMAIN]["data"]["cloud_info"]
             api_endpoint = cloud_info["api_endpoint"]

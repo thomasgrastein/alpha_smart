@@ -40,12 +40,14 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     cloud_info = await httpx_session.get(
         "https://iot-prod-config.s3.eu-central-1.amazonaws.com/v1.json",
     )
+    _LOGGER.debug(cloud_info)
     cloud_info_json = cloud_info.json()
     api_endpoint = cloud_info_json["endpoint"]
     user_pool_id = cloud_info_json["cognito"]["alphaSmart"]["userPoolId"]
     user_pool_region = cloud_info_json["region"]
     client_id = cloud_info_json["cognito"]["alphaSmart"]["webClientId"]
     identity_pool_id = cloud_info_json["cognito"]["alphaSmart"]["identityPoolId"]
+    mqtt_broker_endpoint = cloud_info_json["mqttBrokerEndpoint"]
 
     def get_idp_client():
         return client("cognito-idp", region_name=user_pool_region)
@@ -117,6 +119,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
             "user_pool_id": user_pool_id,
             "user_pool_region": user_pool_region,
             "client_id": client_id,
+            "mqtt_broker_endpoint": mqtt_broker_endpoint,
         },
         "identity_id": identity_id["IdentityId"],
     }

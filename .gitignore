@@ -10,3 +10,4 @@ secrets.yaml
 .storage/*
 blueprints/*
 custom_components/thomasgrastein/__pycache__/*
+deps/*

@@ -25,7 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = [Platform.CLIMATE]
 
-UPDATE_INTERVAL = timedelta(hours=12)
+UPDATE_INTERVAL = timedelta(hours=)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -92,7 +92,7 @@ class AlphaSmartCoordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_interval=UPDATE_INTERVAL,
+            #update_interval=UPDATE_INTERVAL,
         )
 
     async def _async_update_data(self) -> dict[str, Any]:
@@ -169,11 +169,16 @@ class AlphaSmartCoordinator(DataUpdateCoordinator):
         )
 
         def on_connection_failure(connection, callback_data):
-            assert isinstance(callback_data, mqtt.OnConnectionFailureData)
             _LOGGER.error("Connection failed with error %s", callback_data.error)
 
         def on_connection_interrupted(connection, error, **kwargs):
             _LOGGER.error("Connection interrupted with error %s", error)
+
+        def on_connection_resumed(connection, return_code, session_present, **kwargs):
+            _LOGGER.info("Connection resumed with return code %s", return_code)
+
+        def on_connection_success(connection, **kwargs):
+            _LOGGER.info("Connection success")
 
         mqtt_connection = mqtt_connection_builder.websockets_with_default_aws_signing(
             region=self.hass.data[DOMAIN]["data"]["cloud_info"]["user_pool_region"],
@@ -184,6 +189,9 @@ class AlphaSmartCoordinator(DataUpdateCoordinator):
             client_id="eu-central-1:6af4f4fc-fc76-4916-babe-47c9f93b3d29/dPMS2NjaQAS2jPjZwnu3Tv",
             on_connection_interrupted=on_connection_interrupted,
             on_connection_failure=on_connection_failure,
+            on_connection_resumed=on_connection_resumed,
+            on_connection_success=on_connection_success,
+            clean_session=False,
         )
         connect_future = mqtt_connection.connect()
         res = await wrap_future(connect_future)

@@ -25,7 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = [Platform.CLIMATE]
 
-UPDATE_INTERVAL = timedelta(hours=)
+UPDATE_INTERVAL = timedelta(hours=24)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -92,7 +92,7 @@ class AlphaSmartCoordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name=DOMAIN,
-            #update_interval=UPDATE_INTERVAL,
+            # update_interval=UPDATE_INTERVAL,
         )
 
     async def _async_update_data(self) -> dict[str, Any]:

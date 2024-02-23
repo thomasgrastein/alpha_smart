@@ -40,32 +40,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await coordinator.async_config_entry_first_refresh()
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-    _LOGGER.info("Starting websocket task")
-
-    mqtt_connection = await coordinator.async_websocket_connect()
-
-    def on_message_received(topic, payload, dup, qos, retain, **kwargs):
-        # _LOGGER.info("Received message from topic %s: %s", topic, payload)
-        # topic userinfo/eu-central-1:6af4f4fc-fc76-4916-babe-47c9f93b3d29/devices/c3c45f32-ca01-4498-bd88-318323af1517/reported: b'{"10":100,"31":21.08,"33":36}'
-        device_id = topic.split("/")[3]
-        _LOGGER.info("device id: %s", device_id)
-        payload_json = payload.decode("utf-8")
-        _LOGGER.info("payload: %s", payload_json)
-        # self.data[device_id]["30"] = target_temperature
-        # map payload to self.data[device_id]
-        for key, value in json.loads(payload_json).items():
-            coordinator.data[device_id][key] = value
-        coordinator.async_update_listeners()
-
-    subscribe_future, _ = mqtt_connection.subscribe(
-        topic="userinfo/eu-central-1:6af4f4fc-fc76-4916-babe-47c9f93b3d29/#",
-        qos=mqtt.QoS.AT_LEAST_ONCE,
-        callback=on_message_received,
-    )
-    res = await wrap_future(subscribe_future)
-    _LOGGER.info("res: %s", res)
-
-    hass.data[DOMAIN]["mqtt_connection"] = mqtt_connection
 
     return True
 
@@ -92,7 +66,7 @@ class AlphaSmartCoordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name=DOMAIN,
-            # update_interval=UPDATE_INTERVAL,
+            update_interval=UPDATE_INTERVAL,
         )
 
     async def _async_update_data(self) -> dict[str, Any]:
@@ -127,6 +101,35 @@ class AlphaSmartCoordinator(DataUpdateCoordinator):
                     device_values_json["lastHeartbeatAt"],
                 )
                 obj[device["deviceId"]] = device_values_json
+
+            _LOGGER.info("Starting websocket task")
+            if "mqtt_connection" in self.hass.data[DOMAIN]:
+                self.hass.data[DOMAIN]["mqtt_connection"].disconnect()
+                self.hass.data[DOMAIN]["mqtt_connection"] = None
+            mqtt_connection = await self.async_websocket_connect()
+
+            def on_message_received(topic, payload, dup, qos, retain, **kwargs):
+                # _LOGGER.info("Received message from topic %s: %s", topic, payload)
+                # topic userinfo/eu-central-1:6af4f4fc-fc76-4916-babe-47c9f93b3d29/devices/c3c45f32-ca01-4498-bd88-318323af1517/reported: b'{"10":100,"31":21.08,"33":36}'
+                device_id = topic.split("/")[3]
+                _LOGGER.info("device id: %s", device_id)
+                payload_json = payload.decode("utf-8")
+                _LOGGER.info("payload: %s", payload_json)
+                # self.data[device_id]["30"] = target_temperature
+                # map payload to self.data[device_id]
+                for key, value in json.loads(payload_json).items():
+                    self.data[device_id][key] = value
+                self.async_update_listeners()
+
+            subscribe_future, _ = mqtt_connection.subscribe(
+                topic="userinfo/eu-central-1:6af4f4fc-fc76-4916-babe-47c9f93b3d29/#",
+                qos=mqtt.QoS.AT_LEAST_ONCE,
+                callback=on_message_received,
+            )
+            res = await wrap_future(subscribe_future)
+            _LOGGER.info("res: %s", res)
+
+            self.hass.data[DOMAIN]["mqtt_connection"] = mqtt_connection
             return obj
         except ConnectionError as err:
             raise UpdateFailed(f"Error communicating with API: {err}") from err

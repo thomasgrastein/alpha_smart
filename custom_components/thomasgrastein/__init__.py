@@ -23,7 +23,7 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[Platform] = [Platform.CLIMATE]
+PLATFORMS: list[Platform] = [Platform.CLIMATE, Platform.SENSOR]
 
 UPDATE_INTERVAL = timedelta(hours=24)
 

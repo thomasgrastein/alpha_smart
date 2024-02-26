@@ -4,7 +4,7 @@
   "codeowners": ["@thomasgrastein"],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://www.home-assistant.io/integrations/thomasgrastein",
+  "documentation": "https://www.home-assistant.io/integrations/alphasmart",
   "homekit": {},
   "iot_class": "cloud_polling",
   "requirements": [

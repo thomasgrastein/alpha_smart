@@ -5,9 +5,9 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfTemperature
 from homeassistant.core import DOMAIN, HomeAssistant
-from homeassistant.helpers.config_validation import config_entry_only_config_schema
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -16,7 +16,7 @@ from . import AlphaSmartCoordinator
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    config_entry: config_entry_only_config_schema,
+    config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Add AlphaSmartClimate entities from a config_entry."""

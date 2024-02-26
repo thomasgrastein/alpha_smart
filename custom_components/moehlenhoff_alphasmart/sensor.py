@@ -47,7 +47,7 @@ class AlphaSmartSensor(CoordinatorEntity[AlphaSmartCoordinator], SensorEntity):
     ) -> None:
         """Initialize Alpha Smart SensorEntity."""
         super().__init__(coordinator)
-        self._attr_unique_id = device_id
+        self._attr_unique_id = device_id + "_" + type
         self._attr_name = coordinator.data[self.unique_id]["name"] + " " + type
         self.type = type
 
@@ -69,5 +69,7 @@ class AlphaSmartSensor(CoordinatorEntity[AlphaSmartCoordinator], SensorEntity):
     def native_value(self) -> float:
         """Return the current humidity."""
         if self.type == "temperature":
-            return self.coordinator.data[self.unique_id]["31"]
-        return self.coordinator.data[self.unique_id]["33"]
+            return self.coordinator.data[self.unique_id.removesuffix("_" + self.type)][
+                "31"
+            ]
+        return self.coordinator.data[self.unique_id.removesuffix("_" + self.type)]["33"]

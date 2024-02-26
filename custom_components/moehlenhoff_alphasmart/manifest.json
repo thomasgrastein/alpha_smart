@@ -1,10 +1,10 @@
 {
-  "domain": "alphasmart",
-  "name": "Alpha Smart",
+  "domain": "moehlenhoff_alphasmart",
+  "name": "Moehlenhoff Alpha Smart",
   "codeowners": ["@thomasgrastein"],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://www.home-assistant.io/integrations/alphasmart",
+  "documentation": "https://www.home-assistant.io/integrations/moehlenhoff_alphasmart",
   "homekit": {},
   "iot_class": "cloud_polling",
   "requirements": [

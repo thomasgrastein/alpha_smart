@@ -41,6 +41,7 @@ class AlphaSmartSensor(CoordinatorEntity[AlphaSmartCoordinator], SensorEntity):
     """Alpha Smart SensorEntity."""
 
     _attr_state_class = SensorStateClass.MEASUREMENT
+    type: str
 
     def __init__(
         self, coordinator: AlphaSmartCoordinator, device_id: str, type: str

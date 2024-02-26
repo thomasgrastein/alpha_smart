@@ -9,5 +9,5 @@ scripts.yaml
 secrets.yaml
 .storage/*
 blueprints/*
-custom_components/thomasgrastein/__pycache__/*
 deps/*
+**/__pycache__/*

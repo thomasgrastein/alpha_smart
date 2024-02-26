@@ -12,6 +12,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import AlphaSmartCoordinator
+from .const import DOMAIN
 
 
 async def async_setup_entry(

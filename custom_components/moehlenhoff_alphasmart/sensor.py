@@ -48,11 +48,7 @@ class AlphaSmartSensor(CoordinatorEntity[AlphaSmartCoordinator], SensorEntity):
         """Initialize Alpha Smart SensorEntity."""
         super().__init__(coordinator)
         self._attr_unique_id = device_id + "_" + type
-        self._attr_name = (
-            coordinator.data[self.unique_id.removesuffix("_" + self.type)]["name"]
-            + " "
-            + type
-        )
+        self._attr_name = coordinator.data[device_id]["name"] + " " + type
         self.type = type
 
     @property

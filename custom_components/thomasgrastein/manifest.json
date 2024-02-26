@@ -1,5 +1,5 @@
 {
-  "domain": "thomasgrastein",
+  "domain": "alphasmart",
   "name": "Alpha Smart",
   "codeowners": ["@thomasgrastein"],
   "config_flow": true,

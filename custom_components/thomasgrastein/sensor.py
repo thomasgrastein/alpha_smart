@@ -1,16 +1,17 @@
-"""Platform for sensor integration."""
 from __future__ import annotations
 
-from config.custom_components.thomasgrastein import AlphaSmartCoordinator
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
     SensorStateClass,
 )
+from homeassistant.const import UnitOfTemperature
 from homeassistant.core import DOMAIN, HomeAssistant
 from homeassistant.helpers.config_validation import config_entry_only_config_schema
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
+from . import AlphaSmartCoordinator
 
 
 async def async_setup_entry(
@@ -38,7 +39,6 @@ async def async_setup_entry(
 class AlphaSmartSensor(CoordinatorEntity[AlphaSmartCoordinator], SensorEntity):
     """Alpha Smart SensorEntity."""
 
-    _attr_device_class = SensorDeviceClass.HUMIDITY
     _attr_state_class = SensorStateClass.MEASUREMENT
 
     def __init__(
@@ -49,6 +49,20 @@ class AlphaSmartSensor(CoordinatorEntity[AlphaSmartCoordinator], SensorEntity):
         self._attr_unique_id = device_id + "_" + type
         self._attr_name = coordinator.data[self.unique_id]["name"] + " " + type
         self.type = type
+
+    @property
+    def device_class(self) -> str:
+        """Return the device class of the sensor."""
+        if self.type == "temperature":
+            return SensorDeviceClass.TEMPERATURE
+        return SensorDeviceClass.HUMIDITY
+
+    @property
+    def native_unit_of_measurement(self) -> str:
+        """Return the unit of measurement."""
+        if self.type == "temperature":
+            return UnitOfTemperature.CELSIUS
+        return "%"
 
     @property
     def native_value(self) -> float:

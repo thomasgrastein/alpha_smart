@@ -1,5 +1,3 @@
-import logging
-
 from homeassistant.components.climate import ClimateEntity, ClimateEntityFeature
 from homeassistant.components.climate.const import HVACMode
 from homeassistant.config_entries import ConfigEntry
@@ -10,8 +8,6 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import AlphaSmartCoordinator
 from .const import DOMAIN, PRESET_AUTO, PRESET_MANUAL
-
-_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(

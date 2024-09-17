@@ -72,9 +72,6 @@ class AlphaSmartCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data from Alpha Smart."""
         try:
-            if self.hass.data[DOMAIN]["mqtt_connection"]:
-                await self.hass.data[DOMAIN]["mqtt_connection"].disconnect()
-                self.hass.data[DOMAIN]["mqtt_connection"] = None
             devices = []
             for device in self.hass.data[DOMAIN]["data"]["devices"]:
                 if device["oem"] == "Moehlenhoff":
@@ -107,7 +104,9 @@ class AlphaSmartCoordinator(DataUpdateCoordinator):
 
             _LOGGER.info("Starting websocket task")
             if "mqtt_connection" in self.hass.data[DOMAIN]:
-                self.hass.data[DOMAIN]["mqtt_connection"].disconnect()
+                await wrap_future(
+                    self.hass.data[DOMAIN]["mqtt_connection"].disconnect()
+                )
                 self.hass.data[DOMAIN]["mqtt_connection"] = None
             mqtt_connection = await self.async_websocket_connect()
 

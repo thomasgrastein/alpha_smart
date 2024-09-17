@@ -25,7 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = [Platform.CLIMATE, Platform.SENSOR]
 
-UPDATE_INTERVAL = timedelta(hours=24)
+UPDATE_INTERVAL = timedelta(hours=1)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -72,6 +72,9 @@ class AlphaSmartCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data from Alpha Smart."""
         try:
+            if self.hass.data[DOMAIN]["mqtt_connection"]:
+                await self.hass.data[DOMAIN]["mqtt_connection"].disconnect()
+                self.hass.data[DOMAIN]["mqtt_connection"] = None
             devices = []
             for device in self.hass.data[DOMAIN]["data"]["devices"]:
                 if device["oem"] == "Moehlenhoff":
